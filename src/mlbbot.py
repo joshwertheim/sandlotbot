@@ -69,6 +69,8 @@ def setup():
     user = User(client)
     user.identify()
 
+# FIX: Add this to pong: c-50-148-164-198.hsd1.ca.comcast.net
+
 def cmd_parser(input):
     global client
     send = client.sock.send
@@ -76,19 +78,19 @@ def cmd_parser(input):
     if ":spike021" not in input[0]:
         return
     elif ":PING" in input[0]:
-        send("PONG " + index[1] + "\r\n")
+        send("PONG " + "c-50-148-164-198.hsd1.ca.comcast.net :" + input[1] + "\r\n")
     elif ":@headline" in input:
         if len(input) < 5:
-            send("PRIVMSG " + client.INIT_CHANNEL + " :" + ("There are %d articles." % len(stories)) + " \r\n")
+            send("PRIVMSG " + input[2] + " :" + ("There are %d articles." % len(stories)) + " \r\n")
             return
         index = int(input[4]) - 1
 
         if index < 0 or index+1 > len(stories): return
         
-        msg = "PRIVMSG " + client.INIT_CHANNEL + " :" + stories[index].blurb + " \r\n"
+        msg = "PRIVMSG " + input[2] + " :" + stories[index].blurb + " \r\n"
         link = stories[index].article
         send(msg)
-        send("PRIVMSG " + client.INIT_CHANNEL + " " + link + "\r\n")
+        send("PRIVMSG " + input[2] + " " + link + "\r\n")
     elif ":@exit" in input:
         global active
         active = 0
