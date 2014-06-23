@@ -72,15 +72,23 @@ def setup():
 def cmd_parser(input):
     global client
     send = client.sock.send
+
     if ":spike021" not in input[0]:
         return
-    if ":PING" in input[0]:
+    elif ":PING" in input[0]:
         send("PONG " + index[1] + "\r\n")
-    if ":@latest" in input:
-            msg = "PRIVMSG " + client.INIT_CHANNEL + " :" + stories[0].blurb + " \r\n"
-            link = stories[0].article
-            send(msg)
-            send("PRIVMSG " + client.INIT_CHANNEL + " " + link + "\r\n")
+    elif ":@headline" in input:
+        if len(input) < 5:
+            send("PRIVMSG " + client.INIT_CHANNEL + " :" + ("There are %d articles." % len(stories)) + " \r\n")
+            return
+        index = int(input[4]) - 1
+
+        if index < 0 or index+1 > len(stories): return
+        
+        msg = "PRIVMSG " + client.INIT_CHANNEL + " :" + stories[index].blurb + " \r\n"
+        link = stories[index].article
+        send(msg)
+        send("PRIVMSG " + client.INIT_CHANNEL + " " + link + "\r\n")
     elif ":@exit" in input:
         global active
         active = 0
@@ -114,7 +122,7 @@ for index in range(length):
         item = NewsItem(storyElements[index]["althead"], storyElements[index]["url"])
         stories.append(item)
     except:
-        # print "No althead or url found at index %d; skipping to next item..." % index
+        print "No althead or url found at index %d; skipping to next item..." % index
         continue
 
 while active:
