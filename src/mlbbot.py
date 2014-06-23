@@ -11,8 +11,6 @@ import json
 import socket
 import string
 
-# d = date.today()
-# today = d.timetuple()
 
 class NewsItem(object):
     """Creates a NewsItem instance with two properties"""
@@ -154,7 +152,7 @@ def cmd_parser(input):
     elif ":@today" in input:
         send("PRIVMSG " + input[2] + " :" + today_game + "\r\n")
     elif ":@settopic" in input:
-        send("TOPIC " + input[2] + " :" + today_game + "\r\n")
+        send("TOPIC " + input[2] + " :" + "Next game: " today_game + "\r\n")
     elif ":@exit" in input:
         global active
         active = 0
@@ -202,4 +200,4 @@ while active:
         line = string.split(line)
         print line
 
-        cmd_parser(line)        
+        cmd_parser(line)
