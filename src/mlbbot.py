@@ -94,7 +94,12 @@ def cmd_parser(input):
         if len(input) < 5:
             send("PRIVMSG " + input[2] + " :" + ("There are %d articles." % len(stories)) + " \r\n")
             return
-        index = int(input[4]) - 1
+        
+        try: 
+            index = int(input[4]) - 1
+        except:
+            print "Cannot convert input to int..."
+            return
 
         if index < 0 or index+1 > len(stories): return
         
