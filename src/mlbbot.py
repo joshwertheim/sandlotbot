@@ -82,7 +82,9 @@ def cmd_parser(input):
     #     return
     
     if "JOIN" in input[1]:
-        return_addr = input[1].split('@', 1)
+        tmp = input[0].split('@', 1)
+        print "printing tmp %s" % tmp
+        return_addr = tmp[1] + " "
 
     elif "PING" in input[0]:
         msg = "PONG " + return_addr + input[1] + "\r\n"
