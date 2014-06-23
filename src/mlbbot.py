@@ -5,17 +5,17 @@ import sys
 import os
 import time
 from datetime import date
+from datetime import datetime
 import urllib2
 import json
 import socket
 import string
-import json
 
 # d = date.today()
 # today = d.timetuple()
 
 class NewsItem(object):
-    """docstring for NewsItem"""
+    """Creates a NewsItem instance with two properties"""
     blurb = ""
     article = ""
 
@@ -32,7 +32,7 @@ class IRCClient(object):
 
     SERVER = "irc.freenode.net"
     sock = ""
-    INIT_CHANNEL = "#sfgiants-test"
+    INIT_CHANNEL = "#sfgiants"
 
     def __init__(self):
         self.sock = socket.socket()
@@ -72,6 +72,50 @@ def setup():
 # FIX: Add this to pong: c-50-148-164-198.hsd1.ca.comcast.net
 
 return_addr = "" # "c-50-148-164-198.hsd1.ca.comcast.net "
+today_game = ""
+
+def print_today():
+    d = date.today()
+    today = d.timetuple()
+    year = today[0]
+    month = today[1]
+    day = today[2]
+
+    full_date = "%s/%s/%s/" % (year, str(month).zfill(2), str(day).zfill(2))
+
+    # print "%d %d %d" % (today[0], today[1], today[2])
+
+    global today_game
+
+    schedule_url = "http://sanfrancisco.giants.mlb.com/gen/schedule/sf/%s_%s.json" % (year, month)
+    response_schedule = urllib2.urlopen(schedule_url)
+    data = json.load(response_schedule) 
+    data = json.dumps(data, sort_keys=True, indent=4, separators=(',', ': ')) # pretty printed json file object data
+    loaded_json = json.loads(data)
+
+    start_time = ""
+
+    for entry in loaded_json:
+        try:
+            if full_date in entry["game_id"]:
+                versus = entry["away"]["full"] + " @ " + entry["home"]["full"]
+
+                if entry["away"]["full"] == "Giants":
+                    start_time = entry["away"]["start_time_local"]
+                else:
+                    start_time = entry["home"]["start_time_local"]
+
+                start_time = start_time[11:]
+                start_time = start_time[:5]
+                t = time.strptime(start_time, "%H:%M")
+                
+                new_start_time = time.strftime("%I:%M %p", t)
+
+                # print versus + " starting at " + new_start_time
+
+                today_game = versus + " starting at " + new_start_time
+        except:
+            continue
 
 def cmd_parser(input):
     global client
@@ -94,7 +138,7 @@ def cmd_parser(input):
         if len(input) < 5:
             send("PRIVMSG " + input[2] + " :" + ("There are %d articles." % len(stories)) + " \r\n")
             return
-        
+
         try: 
             index = int(input[4]) - 1
         except:
@@ -107,11 +151,16 @@ def cmd_parser(input):
         link = stories[index].article
         send(msg)
         send("PRIVMSG " + input[2] + " " + link + "\r\n")
+    elif ":@today" in input:
+        send("PRIVMSG " + input[2] + " :" + today_game + "\r\n")
+    elif ":@settopic" in input:
+        send("TOPIC " + input[2] + " :" + today_game + "\r\n")
     elif ":@exit" in input:
         global active
         active = 0
 
 setup()
+print_today()
 
 active = 1
 readbuffer = ""
