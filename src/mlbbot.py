@@ -71,14 +71,23 @@ def setup():
 
 # FIX: Add this to pong: c-50-148-164-198.hsd1.ca.comcast.net
 
+return_addr = "" # "c-50-148-164-198.hsd1.ca.comcast.net "
+
 def cmd_parser(input):
     global client
+    global return_addr
     send = client.sock.send
 
-    if ":spike021" not in input[0]:
-        return
-    elif ":PING" in input[0]:
-        send("PONG " + "c-50-148-164-198.hsd1.ca.comcast.net :" + input[1] + "\r\n")
+    # if ":spike021" not in input[0]:
+    #     return
+    
+    if "JOIN" in input[1]:
+        return_addr = input[1].split('@', 1)
+
+    elif "PING" in input[0]:
+        msg = "PONG " + return_addr + input[1] + "\r\n"
+        send(msg)
+        print msg
     elif ":@headline" in input:
         if len(input) < 5:
             send("PRIVMSG " + input[2] + " :" + ("There are %d articles." % len(stories)) + " \r\n")
