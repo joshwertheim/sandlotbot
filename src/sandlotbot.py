@@ -1,5 +1,5 @@
 # usage
-# python mlbbot
+# python sandlotbot
 
 import sys
 import os
