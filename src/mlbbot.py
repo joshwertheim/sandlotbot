@@ -30,7 +30,7 @@ class IRCClient(object):
 
     SERVER = "irc.freenode.net"
     sock = ""
-    INIT_CHANNEL = "#sfgiants"
+    INIT_CHANNEL = "#sfgiants-test"
 
     def __init__(self):
         self.sock = socket.socket()
@@ -86,13 +86,13 @@ def print_today():
 
     schedule_url = "http://sanfrancisco.giants.mlb.com/gen/schedule/sf/%s_%s.json" % (year, month)
     response_schedule = urllib2.urlopen(schedule_url)
-    data = json.load(response_schedule) 
-    data = json.dumps(data, sort_keys=True, indent=4, separators=(',', ': ')) # pretty printed json file object data
-    loaded_json = json.loads(data)
+    schedule_data = json.load(response_schedule) 
+    schedule_data = json.dumps(schedule_data, sort_keys=True, indent=4, separators=(',', ': ')) # pretty printed json file object data
+    loaded_schedule_json = json.loads(schedule_data)
 
     start_time = ""
 
-    for entry in loaded_json:
+    for entry in loaded_schedule_json:
         try:
             if full_date in entry["game_id"]:
                 versus = entry["away"]["full"] + " @ " + entry["home"]["full"]
@@ -167,12 +167,12 @@ def cmd_parser(input):
 def load_headlines():
     global headlines_url
     global response_headline
-    global data
+    global headlines_data
 
     headlines_url = "http://sanfrancisco.giants.mlb.com/gen/sf/news/headlines.json"
     response_headline = urllib2.urlopen(headlines_url)
-    data = json.load(response_headline) 
-    data = json.dumps(data, sort_keys=True, indent=4, separators=(',', ': ')) # pretty printed json file object data
+    headlines_data = json.load(response_headline) 
+    headlines_data = json.dumps(headlines_data, sort_keys=True, indent=4, separators=(',', ': ')) # pretty printed json file object data
 
 setup()
 print_today()
@@ -182,19 +182,19 @@ readbuffer = ""
 
 headlines_url = ""
 response_headline = ""
-data = ""
+headlines_data = ""
 
 load_headlines()
 
-loadedJSON = json.loads(data)
-length = len(loadedJSON["members"])
+loaded_headlines_json = json.loads(headlines_data)
+length = len(loaded_headlines_json["members"])
 
 story_elements = []
 story_blurbs = []
 story_url = []
 
 for index in range(length):
-    story_elements.append(loadedJSON["members"][index])
+    story_elements.append(loaded_headlines_json["members"][index])
 
 length = len(story_elements)
 stories = []
