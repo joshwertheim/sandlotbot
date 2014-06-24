@@ -11,3 +11,7 @@ Currently uses a set of three different JSON feeds provided by the Major League 
 NOTE:
 
 http://gdx.mlb.com/components/copyright.txt
+
+> The accounts, descriptions, data and presentation in the referring page (the "Materials") are proprietary content of MLB Advanced Media, L.P ("MLBAM").  
+Only individual, non-commercial, non-bulk use of the Materials is permitted and any other use of the Materials is prohibited without prior written authorization from MLBAM.  
+Authorized users of the Materials are prohibited from using the Materials in any commercial manner other than as expressly authorized by MLBAM.
