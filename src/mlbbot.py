@@ -152,7 +152,7 @@ def cmd_parser(input):
     elif ":@today" in input:
         send("PRIVMSG " + input[2] + " :" + today_game + "\r\n")
     elif ":@settopic" in input:
-        send("TOPIC " + input[2] + " :" + "Next game: " today_game + "\r\n")
+        send("TOPIC " + input[2] + " :" + "Next game: " + today_game + "\r\n")
     elif ":@exit" in input:
         global active
         active = 0
