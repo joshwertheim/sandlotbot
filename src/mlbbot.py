@@ -71,7 +71,15 @@ def setup():
 return_addr = ""
 today_game = ""
 
+year = ""
+month = ""
+day = ""
+
 def print_today():
+    global year
+    global month
+    global day
+
     d = date.today()
     today = d.timetuple()
     year = today[0]
@@ -113,6 +121,21 @@ def print_today():
                 today_game = versus + " starting at " + new_start_time
         except:
             continue
+
+giants_pitcher_name = ""
+giants_pitcher_era = ""
+
+def get_pitcher_info():
+    # http://sanfrancisco.giants.mlb.com/gdcross/components/game/mlb/year_2014/month_06/day_24/master_scoreboard.json
+
+    global year
+    global month
+    global day
+
+    master_scoreboard_url = "http://sanfrancisco.giants.mlb.com/gdcross/components/game/mlb/year_%s/month_%s/day_%s/master_scoreboard.json" % (year, month, day)
+    print master_scoreboard_url
+
+get_pitcher_info()
 
 def cmd_parser(input):
     global client
@@ -157,9 +180,9 @@ def cmd_parser(input):
         send(msg)
         send("PRIVMSG " + input[2] + " " + link + "\r\n")
     elif ":@today" in input:
-        send("PRIVMSG " + input[2] + " :" + today_game + "\r\n")
+        send("PRIVMSG " + input[2] + " :" + today_game + " PST" + "\r\n")
     elif ":@settopic" in input:
-        send("TOPIC " + input[2] + " :" + "Next game: " + today_game + "\r\n")
+        send("TOPIC " + input[2] + " :" + "Next game: " + today_game + " PST" + "\r\n")
     elif ":@exit" in input:
         global active
         active = 0
@@ -173,6 +196,31 @@ def load_headlines():
     response_headline = urllib2.urlopen(headlines_url)
     headlines_data = json.load(response_headline) 
     headlines_data = json.dumps(headlines_data, sort_keys=True, indent=4, separators=(',', ': ')) # pretty printed json file object data
+
+def irc_connection():
+    global active
+    global readbuffer
+    global client
+    global return_addr
+
+    send = client.sock.send
+    first_time = True
+    
+    while active:
+        readbuffer = readbuffer + client.sock.recv(1024)
+        temp = string.split(readbuffer, "\n")
+        readbuffer = temp.pop()
+
+        for line in temp:
+            line = string.rstrip(line)
+            line = string.split(line)
+            print line
+
+            if first_time and len(line) > 7 and line[6] == "/NAMES":
+                send("PRIVMSG " + line[3] + " :" + "Hi everyone! My current commands are: @headlines, @headlines N (which article in the list you want), and @today to see the starting time for today's game! Let's win today!" + " \r\n")
+                first_time = False
+
+            cmd_parser(line)
 
 setup()
 print_today()
@@ -207,14 +255,6 @@ for index in range(length):
         print "No althead or url found at index %d; skipping to next item..." % index
         continue
 
-while active:
-    readbuffer = readbuffer + client.sock.recv(1024)
-    temp = string.split(readbuffer, "\n")
-    readbuffer = temp.pop()
 
-    for line in temp:
-        line = string.rstrip(line)
-        line = string.split(line)
-        print line
 
-        cmd_parser(line)
+irc_connection()
