@@ -131,8 +131,13 @@ def cmd_parser(input):
         msg = "PONG " + return_addr + input[1] + "\r\n"
         send(msg)
         print msg
-    elif ":@headline" in input:
-        if len(input) < 5:
+    elif ":@headlines" in input:
+        print "this is the input: %s" % input
+        if len(input) == 5 and "refresh" == input[4]:
+            print "refreshing. . . ."
+            load_headlines()
+            return
+        elif len(input) < 5:
             send("PRIVMSG " + input[2] + " :" + ("There are %d articles." % len(stories)) + " \r\n")
             return
 
