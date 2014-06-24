@@ -194,7 +194,6 @@ for index in range(length):
     story_elements.append(loadedJSON["members"][index])
 
 length = len(story_elements)
-
 stories = []
 
 for index in range(length):
