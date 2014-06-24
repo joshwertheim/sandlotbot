@@ -30,7 +30,7 @@ class IRCClient(object):
 
     SERVER = "irc.freenode.net"
     sock = ""
-    INIT_CHANNEL = "#sfgiants"
+    INIT_CHANNEL = "#sfgiants-test"
 
     def __init__(self):
         self.sock = socket.socket()
@@ -52,8 +52,8 @@ class User(object):
 
     def identify(self):
         client.sock.send("NICK %s\r\n" % self.NICK)
+        client.sock.send("PASS %s\r\n" % self.PASS)
         client.sock.send("USER %s %s bla :%s\r\n" % (self.IDENT, client.SERVER, self.REALNAME))
-        client.sock.send("PRIVMSG NickServ identify %s\r\n" % self.PASS)
         client.sock.send("JOIN %s\r\n" % client.INIT_CHANNEL)
 
 client = ""
@@ -156,34 +156,45 @@ def cmd_parser(input):
         global active
         active = 0
 
+def load_headlines():
+    global headlines_url
+    global response_headline
+    global data
+
+    headlines_url = "http://sanfrancisco.giants.mlb.com/gen/sf/news/headlines.json"
+    response_headline = urllib2.urlopen(headlines_url)
+    data = json.load(response_headline) 
+    data = json.dumps(data, sort_keys=True, indent=4, separators=(',', ': ')) # pretty printed json file object data
+
 setup()
 print_today()
 
 active = 1
 readbuffer = ""
 
-headlinesUrl = "http://sanfrancisco.giants.mlb.com/gen/sf/news/headlines.json"
-responseHeadline = urllib2.urlopen(headlinesUrl)
-data = json.load(responseHeadline) 
-data = json.dumps(data, sort_keys=True, indent=4, separators=(',', ': ')) # pretty printed json file object data
+headlines_url = ""
+response_headline = ""
+data = ""
+
+load_headlines()
 
 loadedJSON = json.loads(data)
 length = len(loadedJSON["members"])
 
-storyElements = []
-storyBlurbs = []
-storyUrls = []
+story_elements = []
+story_blurbs = []
+story_url = []
 
 for index in range(length):
-    storyElements.append(loadedJSON["members"][index])
+    story_elements.append(loadedJSON["members"][index])
 
-length = len(storyElements)
+length = len(story_elements)
 
 stories = []
 
 for index in range(length):
     try:
-        item = NewsItem(storyElements[index]["althead"], storyElements[index]["url"])
+        item = NewsItem(story_elements[index]["althead"], story_elements[index]["url"])
         stories.append(item)
     except:
         print "No althead or url found at index %d; skipping to next item..." % index
