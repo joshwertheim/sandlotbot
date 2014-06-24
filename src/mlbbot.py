@@ -67,9 +67,8 @@ def setup():
     user = User(client)
     user.identify()
 
-# FIX: Add this to pong: c-50-148-164-198.hsd1.ca.comcast.net
 
-return_addr = "" # "c-50-148-164-198.hsd1.ca.comcast.net "
+return_addr = ""
 today_game = ""
 
 def print_today():
