@@ -77,7 +77,7 @@ day = ""
 
 home = True
 
-def print_today():
+def get_todays_date():
     global year
     global month
     global day
@@ -88,6 +88,8 @@ def print_today():
     month = today[1]
     day = today[2]
 
+def print_today():
+    
     full_date = "%s/%s/%s/" % (year, str(month).zfill(2), str(day).zfill(2))
 
     # print "%d %d %d" % (today[0], today[1], today[2])
@@ -243,7 +245,8 @@ def irc_connection():
             cmd_parser(line)
 
 setup()
-print_today()
+# print_today()
+get_todays_date()
 
 get_pitcher_info()
 
