@@ -30,7 +30,7 @@ class IRCClient(object):
 
     SERVER = "irc.freenode.net"
     sock = ""
-    INIT_CHANNEL = "#sfgiants-test"
+    INIT_CHANNEL = "#sfgiants"
 
     def __init__(self):
         self.sock = socket.socket()
@@ -75,6 +75,8 @@ year = ""
 month = ""
 day = ""
 
+home = True
+
 def print_today():
     global year
     global month
@@ -107,6 +109,7 @@ def print_today():
 
                 if entry["away"]["full"] == "Giants":
                     start_time = entry["away"]["start_time_local"]
+                    home = False
                 else:
                     start_time = entry["home"]["start_time_local"]
 
@@ -132,10 +135,26 @@ def get_pitcher_info():
     global month
     global day
 
-    master_scoreboard_url = "http://sanfrancisco.giants.mlb.com/gdcross/components/game/mlb/year_%s/month_%s/day_%s/master_scoreboard.json" % (year, month, day)
-    print master_scoreboard_url
+    global giants_pitcher_name
+    global giants_pitcher_era
 
-get_pitcher_info()
+    master_scoreboard_url = "http://mlb.mlb.com/gdcross/components/game/mlb/year_%s/month_%s/day_%s/master_scoreboard.json" % (year, str(month).zfill(2), day)
+    # print master_scoreboard_url
+
+    response_scoreboard = urllib2.urlopen(master_scoreboard_url)
+    scoreboard_data = json.load(response_scoreboard) 
+    scoreboard_data = json.dumps(scoreboard_data, sort_keys=True, indent=4, separators=(',', ': ')) # pretty printed json file object data
+    loaded_schedule_json = json.loads(scoreboard_data)
+    schedule_list = loaded_schedule_json["data"]["games"]["game"]
+
+    for game in schedule_list:
+        if game["away_team_name"] == "Giants":
+            giants_pitcher_name = "%s %s" % (game["away_probable_pitcher"]["first_name"], game["away_probable_pitcher"]["last_name"])
+            giants_pitcher_era = game["away_probable_pitcher"]["era"]
+        else:
+            giants_pitcher_name = "%s %s" % (game["home_probable_pitcher"]["first_name"], game["home_probable_pitcher"]["last_name"])
+            giants_pitcher_era = game["home_probable_pitcher"]["era"]
+
 
 def cmd_parser(input):
     global client
@@ -180,9 +199,9 @@ def cmd_parser(input):
         send(msg)
         send("PRIVMSG " + input[2] + " " + link + "\r\n")
     elif ":@today" in input:
-        send("PRIVMSG " + input[2] + " :" + today_game + " PST" + "\r\n")
+        send("PRIVMSG " + input[2] + " :" + today_game + " PST. " + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA" % (giants_pitcher_era) + "\r\n")
     elif ":@settopic" in input:
-        send("TOPIC " + input[2] + " :" + "Next game: " + today_game + " PST" + "\r\n")
+        send("TOPIC " + input[2] + " :" + today_game + " PST. " + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA" % (giants_pitcher_era) + "\r\n")
     elif ":@exit" in input:
         global active
         active = 0
@@ -217,13 +236,16 @@ def irc_connection():
             print line
 
             if first_time and len(line) > 7 and line[6] == "/NAMES":
-                send("PRIVMSG " + line[3] + " :" + "Hi everyone! My current commands are: @headlines, @headlines N (which article in the list you want), and @today to see the starting time for today's game! Let's win today!" + " \r\n")
+                # send("PRIVMSG " + line[3] + " :" + "Hi everyone! My current commands are: @headlines, @headlines N (which article in the list you want), and @today to see the starting time for today's game! Let's win today!" + " \r\n")
+                send("PRIVMSG " + line[3] + " :" + "Let's win today! [Coming soon: @commands to see available commands]" + " \r\n")
                 first_time = False
 
             cmd_parser(line)
 
 setup()
 print_today()
+
+get_pitcher_info()
 
 active = 1
 readbuffer = ""
@@ -254,7 +276,5 @@ for index in range(length):
     except:
         print "No althead or url found at index %d; skipping to next item..." % index
         continue
-
-
 
 irc_connection()
