@@ -30,7 +30,7 @@ class IRCClient(object):
 
     SERVER = "irc.freenode.net"
     sock = ""
-    INIT_CHANNEL = "#sfgiants-test"
+    INIT_CHANNEL = "#sfgiants"
 
     def __init__(self):
         self.sock = socket.socket()
@@ -132,11 +132,14 @@ def cmd_parser(input):
         send(msg)
         print msg
     elif ":@headlines" in input:
-        print "this is the input: %s" % input
         if len(input) == 5 and "refresh" == input[4]:
-            print "refreshing. . . ."
+            # print "refreshing. . . ."
             load_headlines()
             return
+
+        # adding support for top N stories...
+        # elif len(input) == 6 and "top" == input[4] and "5" == input[5]
+        #     for story in 
         elif len(input) < 5:
             send("PRIVMSG " + input[2] + " :" + ("There are %d articles." % len(stories)) + " \r\n")
             return
