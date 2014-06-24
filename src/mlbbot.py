@@ -48,12 +48,12 @@ class User(object):
         self.NICK = "sandlotbot"
         self.IDENT = "sandlotbot"
         self.REALNAME = "spike021's mlb bot"
-        self.PASS = "shadow021"
+        self.PASS = "b6XH5QmVQLP7rS6"
 
     def identify(self):
         client.sock.send("NICK %s\r\n" % self.NICK)
         client.sock.send("USER %s %s bla :%s\r\n" % (self.IDENT, client.SERVER, self.REALNAME))
-        client.sock.send("PASS %s\r\n" % self.PASS)
+        client.sock.send("PRIVMSG NickServ identify %s\r\n" % self.PASS)
         client.sock.send("JOIN %s\r\n" % client.INIT_CHANNEL)
 
 client = ""
