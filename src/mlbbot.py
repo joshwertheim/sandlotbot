@@ -201,8 +201,12 @@ def cmd_parser(input):
         send(msg)
         send("PRIVMSG " + input[2] + " " + link + "\r\n")
     elif ":@today" in input:
+        get_todays_date()
+        get_pitcher_info()
         send("PRIVMSG " + input[2] + " :" + today_game + " PST. " + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA" % (giants_pitcher_era) + "\r\n")
     elif ":@settopic" in input:
+        get_todays_date()
+        get_pitcher_info()
         send("TOPIC " + input[2] + " :" + today_game + " PST. " + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA" % (giants_pitcher_era) + "\r\n")
     elif ":@exit" in input:
         global active
@@ -246,8 +250,8 @@ def irc_connection():
 
 setup()
 # print_today()
-get_todays_date()
 
+get_todays_date()
 get_pitcher_info()
 
 active = 1
