@@ -30,7 +30,7 @@ class IRCClient(object):
 
     SERVER = "irc.freenode.net"
     sock = ""
-    INIT_CHANNEL = "#sfgiants"
+    INIT_CHANNEL = "#sfgiants-test"
 
     def __init__(self):
         self.sock = socket.socket()
@@ -130,7 +130,9 @@ def print_today():
 giants_pitcher_name = ""
 giants_pitcher_era = ""
 
-def get_pitcher_info():
+current_game_status = ""
+
+def get_scoreboard_info():
     # http://sanfrancisco.giants.mlb.com/gdcross/components/game/mlb/year_2014/month_06/day_24/master_scoreboard.json
 
     global year
@@ -139,6 +141,8 @@ def get_pitcher_info():
 
     global giants_pitcher_name
     global giants_pitcher_era
+
+    global current_game_status
 
     master_scoreboard_url = "http://mlb.mlb.com/gdcross/components/game/mlb/year_%s/month_%s/day_%s/master_scoreboard.json" % (year, str(month).zfill(2), day)
     # print master_scoreboard_url
@@ -150,12 +154,30 @@ def get_pitcher_info():
     schedule_list = loaded_schedule_json["data"]["games"]["game"]
 
     for game in schedule_list:
+        try:
+            if game["away_team_name"] == "Giants" or game["home_team_name"] == "Giants":
+                current_game_status = game["alerts"]["brief_text"]
+        except:
+            current_game_status = "No active game."
+
         if game["away_team_name"] == "Giants":
-            giants_pitcher_name = "%s %s" % (game["away_probable_pitcher"]["first_name"], game["away_probable_pitcher"]["last_name"])
-            giants_pitcher_era = game["away_probable_pitcher"]["era"]
-        else:
-            giants_pitcher_name = "%s %s" % (game["home_probable_pitcher"]["first_name"], game["home_probable_pitcher"]["last_name"])
-            giants_pitcher_era = game["home_probable_pitcher"]["era"]
+            if "away_probable_pitcher" in game:
+                giants_pitcher_name = "%s %s" % (game["away_probable_pitcher"]["first"], game["away_probable_pitcher"]["last"])
+                giants_pitcher_era = game["away_probable_pitcher"]["era"]
+                return
+            else:
+                giants_pitcher_name = "%s %s" % (game["opposing_pitcher"]["first"], game["opposing_pitcher"]["last"])
+                giants_pitcher_era = game["opposing_pitcher"]["era"]
+                return
+        elif game["home_team_name"] == "Giants":
+            if "home_probable_pitcher" in game:
+                giants_pitcher_name = "%s %s" % (game["home_probable_pitcher"]["first"], game["home_probable_pitcher"]["last"])
+                giants_pitcher_era = game["home_probable_pitcher"]["era"]
+                return
+            else:
+                giants_pitcher_name = "%s %s" % (game["pitcher"]["first"], game["pitcher"]["last"])
+                giants_pitcher_era = game["pitcher"]["era"]
+                return
 
 
 def cmd_parser(input):
@@ -202,12 +224,17 @@ def cmd_parser(input):
         send("PRIVMSG " + input[2] + " " + link + "\r\n")
     elif ":@today" in input:
         get_todays_date()
-        get_pitcher_info()
+        print_today()
+        get_scoreboard_info()
         send("PRIVMSG " + input[2] + " :" + today_game + " PST. " + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA" % (giants_pitcher_era) + "\r\n")
     elif ":@settopic" in input:
         get_todays_date()
-        get_pitcher_info()
+        print_today()
+        get_scoreboard_info()
         send("TOPIC " + input[2] + " :" + today_game + " PST. " + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA" % (giants_pitcher_era) + "\r\n")
+    elif ":@status" in input:
+        get_scoreboard_info()
+        send("PRIVMSG " + input[2] + " :" + current_game_status + "\r\n")
     elif ":@exit" in input:
         global active
         active = 0
@@ -252,7 +279,7 @@ setup()
 # print_today()
 
 get_todays_date()
-get_pitcher_info()
+get_scoreboard_info()
 
 active = 1
 readbuffer = ""
