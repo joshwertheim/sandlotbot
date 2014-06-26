@@ -241,12 +241,22 @@ def cmd_parser(input):
         get_todays_date()
         print_today()
         get_scoreboard_info()
-        send("TOPIC " + input[2] + " :" + today_game + " PST. " + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA" % (giants_pitcher_era) + "\r\n")
+
+        if input[4] == "append":
+            msg = input[5:]
+            send("TOPIC " + input[2] + " :" + today_game + " PST. " + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA." % (giants_pitcher_era) + " %s" % (" ".join(msg)) + "\r\n")
+        else:
+            send("TOPIC " + input[2] + " :" + today_game + " PST. " + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA" % (giants_pitcher_era) + "\r\n")
     elif ":@status" in input:
         get_scoreboard_info()
         send("PRIVMSG " + input[2] + " :" + current_game_status + "\r\n")
     elif ":@commands" in input:
-        msg = "PRIVMSG " + input[2] + " :" + "@status (during game), @headlines, @headlines N (choose which story), @headlines top5 (get the top 5 articles' titles with their item numbers), @headlines refresh (manually update @headlines cache), @settopic to set the new topic for the next game (for now only the day of will fetch new info)" + " \r\n"
+        msg = "PRIVMSG " + input[2] + " :" + """@status (during game), @headlines, 
+        @headlines N (choose which story), 
+        @headlines top5 (get the top 5 articles' titles with their item numbers), 
+        @headlines refresh (manually update @headlines cache), @settopic to set 
+        the new topic for the next game (for now only the day of will fetch new info), 
+        @settopic append *string* resets topic and appends a given string.""" + " \r\n"
         send(msg)
     elif ":@src" in input:
         msg = "PRIVMSG " + input[2] + " :" + "https://github.com/joshwertheim/sandlotbot - Feel free to send a pull-request!" + " \r\n"
