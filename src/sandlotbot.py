@@ -202,6 +202,11 @@ def cmd_parser(input):
             # print "refreshing. . . ."
             load_headlines()
             return
+        
+        elif len(input) == 5 and "top5" == input[4]:
+            for index in range(5):
+                msg = "PRIVMSG " + input[2] + " :" + "(%d) " % (index+1) + stories[index].blurb + " \r\n"
+                send(msg)
 
         # adding support for top N stories...
         # elif len(input) == 6 and "top" == input[4] and "5" == input[5]
