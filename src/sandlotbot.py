@@ -248,6 +248,9 @@ def cmd_parser(input):
     elif ":@commands" in input:
         msg = "PRIVMSG " + input[2] + " :" + "@status (during game), @headlines, @headlines N (choose which story), @headlines top5 (get the top 5 articles' titles with their item numbers), @headlines refresh (manually update @headlines cache), @settopic to set the new topic for the next game (for now only the day of will fetch new info)" + " \r\n"
         send(msg)
+    elif ":@src" in input:
+        msg = "PRIVMSG " + input[2] + " :" + "https://github.com/joshwertheim/sandlotbot - Feel free to send a pull-request!" + " \r\n"
+        send(msg)
     elif ":@exit" in input:
         global active
         active = 0
