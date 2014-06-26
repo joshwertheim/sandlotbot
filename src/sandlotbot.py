@@ -131,6 +131,7 @@ giants_pitcher_name = ""
 giants_pitcher_era = ""
 
 current_game_status = ""
+current_game_inning = ""
 
 def get_scoreboard_info():
     # http://sanfrancisco.giants.mlb.com/gdcross/components/game/mlb/year_2014/month_06/day_24/master_scoreboard.json
@@ -143,6 +144,7 @@ def get_scoreboard_info():
     global giants_pitcher_era
 
     global current_game_status
+    global current_game_inning
 
     master_scoreboard_url = "http://mlb.mlb.com/gdcross/components/game/mlb/year_%s/month_%s/day_%s/master_scoreboard.json" % (year, str(month).zfill(2), day)
     # print master_scoreboard_url
@@ -157,6 +159,9 @@ def get_scoreboard_info():
         try:
             if game["away_team_name"] == "Giants" or game["home_team_name"] == "Giants":
                 current_game_status = game["alerts"]["brief_text"]
+                if "Middle 7th" in game["alerts"]["brief_text"]:
+                    msg = "PRIVMSG " + input[2] + " :" + "When the lights.. go down.. in the cityyy... https://www.youtube.com/watch?v=tNG62fULYgI" "\r\n"
+                    send(msg)  # https://www.youtube.com/watch?v=tNG62fULYgI
         except:
             current_game_status = "No active game."
 
@@ -240,6 +245,9 @@ def cmd_parser(input):
     elif ":@status" in input:
         get_scoreboard_info()
         send("PRIVMSG " + input[2] + " :" + current_game_status + "\r\n")
+    elif ":@commands" in input:
+        msg = "PRIVMSG " + input[2] + " :" + "@status (during game), @headlines, @headlines N (choose which story), @headlines top5 (get the top 5 articles' titles with their item numbers), @headlines refresh (manually update @headlines cache), @settopic to set the new topic for the next game (for now only the day of will fetch new info)" + " \r\n"
+        send(msg)
     elif ":@exit" in input:
         global active
         active = 0
@@ -275,7 +283,7 @@ def irc_connection():
 
             if first_time and len(line) > 7 and line[6] == "/NAMES":
                 # send("PRIVMSG " + line[3] + " :" + "Hi everyone! My current commands are: @headlines, @headlines N (which article in the list you want), and @today to see the starting time for today's game! Let's win today!" + " \r\n")
-                send("PRIVMSG " + line[3] + " :" + "Let's win today! [Coming soon: @commands to see available commands]" + " \r\n")
+                send("PRIVMSG " + line[3] + " :" + "Let's win today! [@commands to see available commands]" + " \r\n")
                 first_time = False
 
             cmd_parser(line)
