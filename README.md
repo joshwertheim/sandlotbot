@@ -7,6 +7,16 @@ Feel free to submit a pull-request!
 
 Currently uses a set of three different JSON feeds provided by the Major League Baseball website. Keep in mind that these could change at any time and break the bot's parser.
 
+Working commands:
+
+* @status
+* @headlines - prints number of news articles; tends to stay the same (roughly 12)
+* @headlines N - prints the title and link to the Nth article
+* @headlines top5 - prints the title and link to the top 5 articles
+* @headlines refresh - Resets the headlines cache
+* @settopic - sets the new topic for the day's game
+* @settopic append *str* - will set the topic for the day's game *and* add the string that follows *append*
+* @status - prints the status of the current game (not always up-to-date because json isn't constantly updated on mlb.com)
 
 NOTE from MLB website about using their data:
 
