@@ -9,7 +9,6 @@ Currently uses a set of three different JSON feeds provided by the Major League 
 
 Working commands:
 
-* @status
 * @headlines - prints number of news articles; tends to stay the same (roughly 12)
 * @headlines N - prints the title and link to the Nth article
 * @headlines top5 - prints the title and link to the top 5 articles
@@ -17,6 +16,8 @@ Working commands:
 * @settopic - sets the new topic for the day's game
 * @settopic append *str* - will set the topic for the day's game *and* add the string that follows *append*
 * @status - prints the status of the current game (not always up-to-date because json isn't constantly updated on mlb.com)
+
+Obviously there's a bit of overlap here. Hoping to consolidate these in the near future if possible. Suggestions are welcome!
 
 NOTE from MLB website about using their data:
 
