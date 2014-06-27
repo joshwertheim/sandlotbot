@@ -21,13 +21,11 @@ class NewsItem(object):
         self.blurb = blurb
         self.article = article
 
-    def printElements(self):
-        print self.blurb
-        print self.article
-
 class IRCClient(object):
     """Creates an IRCClient instance with basic server config and functions"""
 
+    # sets default IRC server settings
+    # to-do: *maybe* add support for multiple channels...
     SERVER = "irc.freenode.net"
     sock = ""
     INIT_CHANNEL = "#sfgiants"
@@ -36,8 +34,17 @@ class IRCClient(object):
         self.sock = socket.socket()
         self.sock.connect((self.SERVER, 6667))
 
-class User(object):
-    """Creates a User instance with basic user config and functions"""
+    # send_message()
+    # requires two parameters: destination, message
+    # both params expect strings
+    # destination: usually input[2] in command parser function, AKA channel target
+    # message: the message to be sent. can be simple or more complex
+    def send_message(self, destination, message):
+        msg = "PRIVMSG " + destination + " :" + message + "\r\n"
+        self.sock.send(msg)
+
+class Bot(object):
+    """Creates a Bot instance with basic bot config and functions"""
 
     NICK = ""
     IDENT = ""
@@ -59,12 +66,13 @@ class User(object):
 client = ""
 user = ""
 
+# Basic setup function for starting IRC and logging into bot account
 def setup():
     global client
     global user
 
     client = IRCClient()
-    user = User(client)
+    user = Bot(client)
     user.identify()
 
 
@@ -188,11 +196,21 @@ def get_scoreboard_info():
 def cmd_parser(input):
     global client
     global return_addr
-    send = client.sock.send
 
     # if ":spike021" not in input[0]:
     #     return
     
+    destination = ""
+    message = ""
+
+    send = client.sock.send
+
+    try:
+        destination = input[2]
+    except:
+        print "no input[2]"
+        destination = "None"
+
     if "JOIN" in input[1]:
         tmp = input[0].split('@', 1)
         print "printing tmp %s" % tmp
@@ -200,24 +218,26 @@ def cmd_parser(input):
 
     elif "PING" in input[0]:
         msg = "PONG " + return_addr + input[1] + "\r\n"
-        send(msg)
+        client.sock.send(msg)
         print msg
     elif ":@headlines" in input:
         if len(input) == 5 and "refresh" == input[4]:
-            # print "refreshing. . . ."
             load_headlines()
+            message =  "Headlines are refreshed."
+            client.send_message(destination, message)
             return
         
         elif len(input) == 5 and "top5" == input[4]:
             for index in range(5):
-                msg = "PRIVMSG " + input[2] + " :" + "(%d) " % (index+1) + stories[index].blurb + " \r\n"
-                send(msg)
+                msg = "(%d) " % (index+1) + stories[index].blurb
+                client.send_message(msg)
 
         # adding support for top N stories...
         # elif len(input) == 6 and "top" == input[4] and "5" == input[5]
         #     for story in 
         elif len(input) < 5:
-            send("PRIVMSG " + input[2] + " :" + ("There are %d articles." % len(stories)) + " \r\n")
+            msg = "There are %d articles." % len(stories)
+            client.send_message(destination, msg)
             return
 
         try: 
@@ -226,41 +246,42 @@ def cmd_parser(input):
             print "Cannot convert input to int..."
             return
 
-        if index < 0 or index+1 > len(stories): return
+        if index < 0 or index+1 > len(stories):
+            return
         
-        msg = "PRIVMSG " + input[2] + " :" + stories[index].blurb + " \r\n"
+        msg = stories[index].blurb
         link = stories[index].article
-        send(msg)
-        send("PRIVMSG " + input[2] + " " + link + "\r\n")
+        client.send_message(destination, msg)
+        client.send_message(destination, link)
     elif ":@today" in input:
         get_todays_date()
         print_today()
         get_scoreboard_info()
-        send("PRIVMSG " + input[2] + " :" + today_game + " PST. " + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA" % (giants_pitcher_era) + "\r\n")
+
+        msg = today_game + " PST. " + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA" % (giants_pitcher_era)
+        client.send_message(destination, msg)
     elif ":@settopic" in input:
         get_todays_date()
         print_today()
         get_scoreboard_info()
 
-        if input[4] == "append":
-            msg = input[5:]
-            send("TOPIC " + input[2] + " :" + today_game + " PST. " + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA." % (giants_pitcher_era) + " %s" % (" ".join(msg)) + "\r\n")
+        if len(input) > 5 and input[4] == "append":
+            extra_str = input[5:]
+            msg = today_game + " PST. " + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA." % (giants_pitcher_era) + " %s" % (" ".join(extra_str))
+            client.send_message(destination, msg)
         else:
-            send("TOPIC " + input[2] + " :" + today_game + " PST. " + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA" % (giants_pitcher_era) + "\r\n")
+            msg = today_game + " PST. " + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA" % (giants_pitcher_era)
+            client.send_message(destination, msg)
     elif ":@status" in input:
         get_scoreboard_info()
-        send("PRIVMSG " + input[2] + " :" + current_game_status + "\r\n")
+        msg = current_game_status
+        client.send_message(destination, msg)
     elif ":@commands" in input:
-        msg = "PRIVMSG " + input[2] + " :" + """@status (during game), @headlines, 
-        @headlines N (choose which story), 
-        @headlines top5 (get the top 5 articles' titles with their item numbers), 
-        @headlines refresh (manually update @headlines cache), @settopic to set 
-        the new topic for the next game (for now only the day of will fetch new info), 
-        @settopic append *string* resets topic and appends a given string.""" + " \r\n"
-        send(msg)
+        msg = "@status (during game), @headlines, @headlines N (choose which story), @headlines top5 (get the top 5 articles' titles with their item numbers), @headlines refresh (manually update @headlines cache), @settopic to set the new topic for the next game (for now only the day of will fetch new info), @settopic append *string* resets topic and appends a given string."
+        client.send_message(destination, msg)
     elif ":@src" in input:
-        msg = "PRIVMSG " + input[2] + " :" + "https://github.com/joshwertheim/sandlotbot - Feel free to send a pull-request!" + " \r\n"
-        send(msg)
+        msg = "https://github.com/joshwertheim/sandlotbot - Feel free to send a pull-request!"
+        client.send_message(destination, msg)
     elif ":@exit" in input:
         global active
         active = 0
