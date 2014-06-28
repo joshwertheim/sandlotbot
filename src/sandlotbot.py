@@ -230,11 +230,8 @@ def cmd_parser(input):
         elif len(input) == 5 and "top5" == input[4]:
             for index in range(5):
                 msg = "(%d) " % (index+1) + stories[index].blurb
-                client.send_message(msg)
+                client.send_message(destination, msg)
 
-        # adding support for top N stories...
-        # elif len(input) == 6 and "top" == input[4] and "5" == input[5]
-        #     for story in 
         elif len(input) < 5:
             msg = "There are %d articles." % len(stories)
             client.send_message(destination, msg)
@@ -260,18 +257,18 @@ def cmd_parser(input):
 
         msg = today_game + " PST. " + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA" % (giants_pitcher_era)
         client.send_message(destination, msg)
-    elif ":@settopic" in input:
+    elif ":@settopic" in input: # send("TOPIC " + input[2] + " :" + today_game + " PST. " + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA" % (giants_pitcher_era) + "\r\n")
         get_todays_date()
         print_today()
         get_scoreboard_info()
 
         if len(input) > 5 and input[4] == "append":
             extra_str = input[5:]
-            msg = today_game + " PST. " + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA." % (giants_pitcher_era) + " %s" % (" ".join(extra_str))
-            client.send_message(destination, msg)
+            # msg = today_game + " PST. " + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA." % (giants_pitcher_era) + " %s" % (" ".join(extra_str))
+            send("TOPIC " + input[2] + " :" + today_game + " PST. " + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA." % (giants_pitcher_era) + " %s" % (" ".join(extra_str)) + "\r\n")
+            # client.send_message(destination, msg)
         else:
-            msg = today_game + " PST. " + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA" % (giants_pitcher_era)
-            client.send_message(destination, msg)
+            send("TOPIC " + input[2] + " :" + today_game + " PST. " + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA" % (giants_pitcher_era) + "\r\n")
     elif ":@status" in input:
         get_scoreboard_info()
         msg = current_game_status
