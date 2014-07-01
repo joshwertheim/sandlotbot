@@ -154,7 +154,7 @@ def get_scoreboard_info():
     global current_game_status
     global current_game_inning
 
-    master_scoreboard_url = "http://mlb.mlb.com/gdcross/components/game/mlb/year_%s/month_%s/day_%s/master_scoreboard.json" % (year, str(month).zfill(2), day)
+    master_scoreboard_url = "http://mlb.mlb.com/gdcross/components/game/mlb/year_%s/month_%s/day_%s/master_scoreboard.json" % (year, str(month).zfill(2), str(day).zfill(2))
     # print master_scoreboard_url
 
     response_scoreboard = urllib2.urlopen(master_scoreboard_url)
@@ -208,7 +208,7 @@ def cmd_parser(input):
     try:
         destination = input[2]
     except:
-        print "no input[2]"
+        # print "no input[2]"
         destination = "None"
 
     if "JOIN" in input[1]:
