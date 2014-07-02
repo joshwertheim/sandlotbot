@@ -28,7 +28,7 @@ class IRCClient(object):
     # to-do: *maybe* add support for multiple channels...
     SERVER = "irc.freenode.net"
     sock = ""
-    INIT_CHANNEL = "#sfgiants"
+    INIT_CHANNEL = "#sfgiants-test"
 
     def __init__(self):
         self.sock = socket.socket()
@@ -211,11 +211,12 @@ def cmd_parser(input):
         # print "no input[2]"
         destination = "None"
 
-    if "JOIN" in input[1]:
-        tmp = input[0].split('@', 1)
-        print "printing tmp %s" % tmp
-        return_addr = tmp[1] + " "
+    ret = input[0]
+    ret = ret[1:11]
 
+    if "JOIN" in input[1] and ret == "sandlotbot":
+        tmp = input[0].split('@', 1)
+        return_addr = tmp[1] + " "
     elif "PING" in input[0]:
         msg = "PONG " + return_addr + input[1] + "\r\n"
         client.sock.send(msg)
