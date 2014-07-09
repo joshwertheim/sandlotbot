@@ -30,7 +30,7 @@ class IRCClient(object):
     # to-do: *maybe* add support for multiple channels...
     SERVER = "irc.freenode.net"
     sock = ""
-    INIT_CHANNEL = "#sfgiants-test"
+    INIT_CHANNEL = "#sfgiants"
 
     def __init__(self):
         self.sock = socket.socket()
