@@ -11,6 +11,8 @@ import json
 import socket
 import string
 
+from pprint import pprint
+
 
 class NewsItem(object):
     """Creates a NewsItem instance with two properties"""
@@ -28,7 +30,7 @@ class IRCClient(object):
     # to-do: *maybe* add support for multiple channels...
     SERVER = "irc.freenode.net"
     sock = ""
-    INIT_CHANNEL = "#sfgiants"
+    INIT_CHANNEL = "#sfgiants-test"
 
     def __init__(self):
         self.sock = socket.socket()
@@ -138,6 +140,8 @@ def print_today():
 giants_pitcher_name = ""
 giants_pitcher_era = ""
 
+end_game_message = ""
+
 current_game_status = ""
 current_game_inning = ""
 
@@ -151,6 +155,8 @@ def get_scoreboard_info():
     global giants_pitcher_name
     global giants_pitcher_era
 
+    global end_game_message
+
     global current_game_status
     global current_game_inning
 
@@ -163,22 +169,30 @@ def get_scoreboard_info():
     loaded_schedule_json = json.loads(scoreboard_data)
     schedule_list = loaded_schedule_json["data"]["games"]["game"]
 
+    send = client.sock.send
+
     for game in schedule_list:
         try:
             if game["away_team_name"] == "Giants" or game["home_team_name"] == "Giants":
                 current_game_status = game["alerts"]["brief_text"]
-                if "Middle 7th" in game["alerts"]["brief_text"]:
-                    msg = "PRIVMSG " + input[2] + " :" + "When the lights.. go down.. in the cityyy... https://www.youtube.com/watch?v=tNG62fULYgI" "\r\n"
-                    send(msg)  # https://www.youtube.com/watch?v=tNG62fULYgI
+                # if "Middle 7th" in game["alerts"]["brief_text"]:
+                #     msg = "PRIVMSG " + input[2] + " :" + "When the lights.. go down.. in the cityyy... https://www.youtube.com/watch?v=tNG62fULYgI" "\r\n"
+                #     send(msg)  # https://www.youtube.com/watch?v=tNG62fULYgI
         except:
-            current_game_status = "No active game."
+            if "winning_pitcher" in game and (game["home_team_name"] == "Giants" or game["away_team_name"] == "Giants"):
+                winning_pitcher = "%s %s" % (game["winning_pitcher"]["first"], game["winning_pitcher"]["last"])
+                losing_pitcher = "%s %s" % (game["losing_pitcher"]["first"], game["losing_pitcher"]["last"])
+                end_game_message = "Game over. Winning pitcher: %s. Losing pitcher: %s." % (winning_pitcher, losing_pitcher)
+                current_game_status = ""
+            else:
+                current_game_status = "No active game."
 
         if game["away_team_name"] == "Giants":
             if "away_probable_pitcher" in game:
                 giants_pitcher_name = "%s %s" % (game["away_probable_pitcher"]["first"], game["away_probable_pitcher"]["last"])
                 giants_pitcher_era = game["away_probable_pitcher"]["era"]
                 return
-            else:
+            elif "opposing_pitcher" in game:
                 giants_pitcher_name = "%s %s" % (game["opposing_pitcher"]["first"], game["opposing_pitcher"]["last"])
                 giants_pitcher_era = game["opposing_pitcher"]["era"]
                 return
@@ -187,11 +201,10 @@ def get_scoreboard_info():
                 giants_pitcher_name = "%s %s" % (game["home_probable_pitcher"]["first"], game["home_probable_pitcher"]["last"])
                 giants_pitcher_era = game["home_probable_pitcher"]["era"]
                 return
-            else:
+            elif "pitcher" in game:
                 giants_pitcher_name = "%s %s" % (game["pitcher"]["first"], game["pitcher"]["last"])
                 giants_pitcher_era = game["pitcher"]["era"]
                 return
-
 
 def cmd_parser(input):
     global client
@@ -272,7 +285,10 @@ def cmd_parser(input):
             send("TOPIC " + input[2] + " :" + today_game + " PST. " + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA" % (giants_pitcher_era) + "\r\n")
     elif ":@status" in input:
         get_scoreboard_info()
-        msg = current_game_status
+        if current_game_status != "":    
+            msg = current_game_status
+        else:
+            msg = end_game_message
         client.send_message(destination, msg)
     elif ":@commands" in input:
         msg = "@status (during game), @headlines, @headlines N (choose which story), @headlines top5 (get the top 5 articles' titles with their item numbers), @headlines refresh (manually update @headlines cache), @settopic to set the new topic for the next game (for now only the day of will fetch new info), @settopic append *string* resets topic and appends a given string."
