@@ -249,6 +249,7 @@ def get_scoreboard_info():
 def cmd_parser(input):
     global client
     global return_addr
+    global players
 
     # if ":spike021" not in input[0]:
     #     return
@@ -333,6 +334,7 @@ def cmd_parser(input):
     elif ":@lineup" in input:
         parse_lineup_feed()
         msg = players
+        players = list()
         client.send_message(destination, msg)
     elif ":@commands" in input:
         msg = "@status (during game), @headlines, @headlines N (choose which story), @headlines top5 (get the top 5 articles' titles with their item numbers), @headlines refresh (manually update @headlines cache), @settopic to set the new topic for the next game (for now only the day of will fetch new info), @settopic append *string* resets topic and appends a given string."
