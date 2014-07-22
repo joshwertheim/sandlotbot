@@ -78,6 +78,11 @@ def setup():
     user.identify()
 
 
+starting_lineup_feed = ""
+team_id = "137" # SF Giants current team ID - liable to change next season...
+lineup = {}
+players = list()
+
 return_addr = ""
 today_game = ""
 
@@ -144,6 +149,41 @@ end_game_message = ""
 
 current_game_status = ""
 current_game_inning = ""
+
+
+def parse_lineup_feed():
+    global starting_lineup_feed
+    global team_id
+    global lineup
+
+    get_todays_date()
+    starting_lineup_feed = "http://sanfrancisco.giants.mlb.com/gen/lineups/%s/%s/%s.json" % (year, str(month).zfill(2), str(day).zfill(2))
+
+    response = urllib2.urlopen(starting_lineup_feed)
+    lineup_data = json.load(response) 
+    lineup_data = json.dumps(lineup_data, sort_keys=True, indent=4, separators=(',', ': ')) # pretty printed json file object data
+    loaded_lineup_data = json.loads(lineup_data)
+
+    lineups_dict  = loaded_lineup_data["list"]
+
+    for entry in lineups_dict:
+        # print "%s" % entry
+        # print "%s" % entry["team_id"]
+        if entry["team_id"] == team_id:
+            lineup = entry
+            break
+
+    global players
+
+    pos = 1
+    
+    for player in lineup["players"]:
+        name_pos = "%d. %s (%s)" % (pos, player.get("last_name"), player.get("position"))
+        players.append(name_pos)
+        pos += 1
+
+    players = ", ".join(players)
+
 
 def get_scoreboard_info():
     # http://sanfrancisco.giants.mlb.com/gdcross/components/game/mlb/year_2014/month_06/day_24/master_scoreboard.json
@@ -289,6 +329,10 @@ def cmd_parser(input):
             msg = current_game_status
         else:
             msg = end_game_message
+        client.send_message(destination, msg)
+    elif ":@lineup" in input:
+        parse_lineup_feed()
+        msg = players
         client.send_message(destination, msg)
     elif ":@commands" in input:
         msg = "@status (during game), @headlines, @headlines N (choose which story), @headlines top5 (get the top 5 articles' titles with their item numbers), @headlines refresh (manually update @headlines cache), @settopic to set the new topic for the next game (for now only the day of will fetch new info), @settopic append *string* resets topic and appends a given string."
