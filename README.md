@@ -18,6 +18,7 @@ Working commands:
 * @settopic - sets the new topic for the day's game
 * @settopic append *str* - will set the topic for the day's game *and* add the string that follows *append*
 * @status - prints the status of the current game (not always up-to-date because json isn't constantly updated on mlb.com)
+* @lineup - prints the current/upcoming game's lineup (only works the day of)
 * @exit - bot closes up shop and disconnects from the default server (freenode in this case)
 
 Obviously there's a bit of overlap here. Hoping to consolidate these in the near future if possible. Suggestions are welcome!
