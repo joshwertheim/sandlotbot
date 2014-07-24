@@ -346,10 +346,13 @@ def cmd_parser(input):
         global active
         active = 0
 
+global stories
+
 def load_headlines():
     global headlines_url
     global response_headline
     global headlines_data
+    global stories
 
     headlines_url = "http://sanfrancisco.giants.mlb.com/gen/sf/news/headlines.json"
     response_headline = urllib2.urlopen(headlines_url)
