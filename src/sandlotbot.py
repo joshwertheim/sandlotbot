@@ -250,6 +250,7 @@ def cmd_parser(input):
     global client
     global return_addr
     global players
+    global stories
 
     # if ":spike021" not in input[0]:
     #     return
