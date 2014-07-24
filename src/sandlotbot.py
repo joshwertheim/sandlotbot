@@ -356,6 +356,27 @@ def load_headlines():
     headlines_data = json.load(response_headline) 
     headlines_data = json.dumps(headlines_data, sort_keys=True, indent=4, separators=(',', ': ')) # pretty printed json file object data
 
+    loaded_headlines_json = json.loads(headlines_data)
+    length = len(loaded_headlines_json["members"])
+
+    story_elements = []
+    story_blurbs = []
+    story_url = []
+
+    for index in range(length):
+        story_elements.append(loaded_headlines_json["members"][index])
+
+    length = len(story_elements)
+    stories = []
+
+    for index in range(length):
+        try:
+            item = NewsItem(story_elements[index]["althead"], story_elements[index]["url"])
+            stories.append(item)
+        except:
+            print "No althead or url found at index %d; skipping to next item..." % index
+            continue
+
 def irc_connection():
     global active
     global readbuffer
@@ -396,26 +417,4 @@ response_headline = ""
 headlines_data = ""
 
 load_headlines()
-
-loaded_headlines_json = json.loads(headlines_data)
-length = len(loaded_headlines_json["members"])
-
-story_elements = []
-story_blurbs = []
-story_url = []
-
-for index in range(length):
-    story_elements.append(loaded_headlines_json["members"][index])
-
-length = len(story_elements)
-stories = []
-
-for index in range(length):
-    try:
-        item = NewsItem(story_elements[index]["althead"], story_elements[index]["url"])
-        stories.append(item)
-    except:
-        print "No althead or url found at index %d; skipping to next item..." % index
-        continue
-
 irc_connection()
