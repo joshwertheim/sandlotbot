@@ -176,14 +176,17 @@ def parse_lineup_feed():
     global players
 
     pos = 1
-    
-    for player in lineup["players"]:
-        name_pos = "%d. %s (%s)" % (pos, player.get("last_name"), player.get("position"))
-        players.append(name_pos)
-        pos += 1
 
-    players = ", ".join(players)
+    if "players" in lineup:
+        for player in lineup["players"]:
+            name_pos = "%d. %s (%s)" % (pos, player.get("last_name"), player.get("position"))
+            players.append(name_pos)
+            pos += 1
+        players = ", ".join(players)
 
+    else:
+        print "Players not found."
+        return
 
 def get_scoreboard_info():
     # http://sanfrancisco.giants.mlb.com/gdcross/components/game/mlb/year_2014/month_06/day_24/master_scoreboard.json
