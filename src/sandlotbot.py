@@ -186,6 +186,7 @@ def parse_lineup_feed():
 
     else:
         print "Players not found."
+        players = None
         return
 
 def get_scoreboard_info():
@@ -336,9 +337,13 @@ def cmd_parser(input):
             msg = end_game_message
         client.send_message(destination, msg)
     elif ":@lineup" in input:
+        msg = ""
         parse_lineup_feed()
-        msg = players
-        players = list()
+        if players == None:
+            msg = "No lineup. Please check back later."
+        else:
+            msg = players
+            players = list()
         client.send_message(destination, msg)
     elif ":@commands" in input:
         msg = "@status (during game), @headlines, @headlines N (choose which story), @headlines top5 (get the top 5 articles' titles with their item numbers), @headlines refresh (manually update @headlines cache), @settopic to set the new topic for the next game (for now only the day of will fetch new info), @settopic append *string* resets topic and appends a given string."
