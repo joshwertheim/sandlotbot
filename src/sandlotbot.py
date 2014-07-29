@@ -12,6 +12,7 @@ import socket
 import string
 
 from feed import Feed
+from irc import IRCClient, Bot
 
 class NewsItem(object):
     """Creates a NewsItem instance with two properties"""
@@ -21,48 +22,6 @@ class NewsItem(object):
     def __init__(self, blurb, article):
         self.blurb = blurb
         self.article = article
-
-class IRCClient(object):
-    """Creates an IRCClient instance with basic server config and functions"""
-
-    # sets default IRC server settings
-    # to-do: *maybe* add support for multiple channels...
-    SERVER = "irc.freenode.net"
-    sock = ""
-    INIT_CHANNEL = "#sfgiants"
-
-    def __init__(self):
-        self.sock = socket.socket()
-        self.sock.connect((self.SERVER, 6667))
-
-    # send_message()
-    # requires two parameters: destination, message
-    # both params expect strings
-    # destination: usually input[2] in command parser function, AKA channel target
-    # message: the message to be sent. can be simple or more complex
-    def send_message(self, destination, message):
-        msg = "PRIVMSG " + destination + " :" + message + "\r\n"
-        self.sock.send(msg)
-
-class Bot(object):
-    """Creates a Bot instance with basic bot config and functions"""
-
-    NICK = ""
-    IDENT = ""
-    REALNAME = ""
-    PASS = ""
-
-    def __init__(self, client):
-        self.NICK = "sandlotbot"
-        self.IDENT = "sandlotbot"
-        self.REALNAME = "spike021's mlb bot"
-        self.PASS = "b6XH5QmVQLP7rS6"
-
-    def identify(self):
-        client.sock.send("NICK %s\r\n" % self.NICK)
-        client.sock.send("PASS %s\r\n" % self.PASS)
-        client.sock.send("USER %s %s bla :%s\r\n" % (self.IDENT, client.SERVER, self.REALNAME))
-        client.sock.send("JOIN %s\r\n" % client.INIT_CHANNEL)
 
 client = ""
 user = ""
@@ -419,8 +378,6 @@ def irc_connection():
             cmd_parser(line)
 
 setup()
-# print_today()
-
 get_todays_date()
 get_scoreboard_info()
 
