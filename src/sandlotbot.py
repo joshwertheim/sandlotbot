@@ -11,8 +11,7 @@ import json
 import socket
 import string
 
-from pprint import pprint
-
+from feed import Feed
 
 class NewsItem(object):
     """Creates a NewsItem instance with two properties"""
@@ -159,10 +158,15 @@ def parse_lineup_feed():
     get_todays_date()
     starting_lineup_feed = "http://sanfrancisco.giants.mlb.com/gen/lineups/%s/%s/%s.json" % (year, str(month).zfill(2), str(day).zfill(2))
 
-    response = urllib2.urlopen(starting_lineup_feed)
-    lineup_data = json.load(response) 
-    lineup_data = json.dumps(lineup_data, sort_keys=True, indent=4, separators=(',', ': ')) # pretty printed json file object data
-    loaded_lineup_data = json.loads(lineup_data)
+    feed = Feed(starting_lineup_feed)
+    feed.load_and_prepare()
+    succeeded, loaded_lineup_data = feed.get_representation
+
+    global players
+
+    if succeeded == False:
+        players = None
+        return
 
     lineups_dict  = loaded_lineup_data["list"]
 
@@ -172,8 +176,6 @@ def parse_lineup_feed():
         if entry["team_id"] == team_id:
             lineup = entry
             break
-
-    global players
 
     pos = 1
 
@@ -190,8 +192,6 @@ def parse_lineup_feed():
         return
 
 def get_scoreboard_info():
-    # http://sanfrancisco.giants.mlb.com/gdcross/components/game/mlb/year_2014/month_06/day_24/master_scoreboard.json
-
     global year
     global month
     global day
@@ -205,12 +205,11 @@ def get_scoreboard_info():
     global current_game_inning
 
     master_scoreboard_url = "http://mlb.mlb.com/gdcross/components/game/mlb/year_%s/month_%s/day_%s/master_scoreboard.json" % (year, str(month).zfill(2), str(day).zfill(2))
-    # print master_scoreboard_url
 
-    response_scoreboard = urllib2.urlopen(master_scoreboard_url)
-    scoreboard_data = json.load(response_scoreboard) 
-    scoreboard_data = json.dumps(scoreboard_data, sort_keys=True, indent=4, separators=(',', ': ')) # pretty printed json file object data
-    loaded_schedule_json = json.loads(scoreboard_data)
+    feed = Feed(master_scoreboard_url)
+    feed.load_and_prepare()
+    succeeded, loaded_schedule_json = feed.get_representation
+    
     schedule_list = loaded_schedule_json["data"]["games"]["game"]
 
     send = client.sock.send
@@ -346,7 +345,7 @@ def cmd_parser(input):
             players = list()
         client.send_message(destination, msg)
     elif ":@commands" in input:
-        msg = "@status (during game), @headlines, @headlines N (choose which story), @headlines top5 (get the top 5 articles' titles with their item numbers), @headlines refresh (manually update @headlines cache), @settopic to set the new topic for the next game (for now only the day of will fetch new info), @settopic append *string* resets topic and appends a given string."
+        msg = "@status (during game), @headlines, @headlines N (choose which story), @headlines top5 (get the top 5 articles' titles with their item numbers), @headlines refresh (manually update @headlines cache), @settopic to set the new topic for the next game (for now only the day of will fetch new info), @settopic append *string* resets topic and appends a given string, @lineup today's game's lineup for SF Giants."
         client.send_message(destination, msg)
     elif ":@src" in input:
         msg = "https://github.com/joshwertheim/sandlotbot - Feel free to send a pull-request!"
@@ -364,11 +363,10 @@ def load_headlines():
     global stories
 
     headlines_url = "http://sanfrancisco.giants.mlb.com/gen/sf/news/headlines.json"
-    response_headline = urllib2.urlopen(headlines_url)
-    headlines_data = json.load(response_headline) 
-    headlines_data = json.dumps(headlines_data, sort_keys=True, indent=4, separators=(',', ': ')) # pretty printed json file object data
-
-    loaded_headlines_json = json.loads(headlines_data)
+    
+    feed = Feed(headlines_url)
+    feed.load_and_prepare()
+    succeeded, loaded_headlines_json = feed.get_representation
     length = len(loaded_headlines_json["members"])
 
     story_elements = []
