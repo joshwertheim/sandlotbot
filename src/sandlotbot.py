@@ -111,6 +111,11 @@ def print_today():
     global today_game
 
     schedule_url = "http://sanfrancisco.giants.mlb.com/gen/schedule/sf/%s_%s.json" % (year, month)
+
+    feed = Feed(schedule_url)
+    feed.load_and_prepare()
+    succeeded, loaded_schedule_json = feed.get_representation
+
     response_schedule = urllib2.urlopen(schedule_url)
     schedule_data = json.load(response_schedule) 
     schedule_data = json.dumps(schedule_data, sort_keys=True, indent=4, separators=(',', ': ')) # pretty printed json file object data
