@@ -13,6 +13,7 @@ import string
 
 from feed import Feed
 from irc import IRCClient, Bot
+from player_stats import PlayerStatsParser
 
 class NewsItem(object):
     """Creates a NewsItem instance with two properties"""
@@ -227,6 +228,8 @@ def cmd_parser(input):
 
     send = client.sock.send
 
+    stats = PlayerStatsParser()
+
     try:
         destination = input[2]
     except:
@@ -307,6 +310,14 @@ def cmd_parser(input):
         else:
             msg = players
             players = list()
+        client.send_message(destination, msg)
+    elif ":@batter" in input:
+        stats.parse_stats()
+        msg = stats.get_batter(input[4])
+        client.send_message(destination, msg)
+    elif ":@pitcher" in input:
+        stats.parse_stats()
+        msg = stats.get_pitcher(input[4])
         client.send_message(destination, msg)
     elif ":@commands" in input:
         msg = "@status (during game), @headlines, @headlines N (choose which story), @headlines top5 (get the top 5 articles' titles with their item numbers), @headlines refresh (manually update @headlines cache), @settopic to set the new topic for the next game (for now only the day of will fetch new info), @settopic append *string* resets topic and appends a given string, @lineup today's game's lineup for SF Giants."
