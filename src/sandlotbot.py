@@ -312,7 +312,7 @@ def cmd_parser(input):
             players = list()
         client.send_message(destination, msg)
     elif ":@batter" in input:
-        if input[4] == None or input[4] == "":
+        if len(input) < 5:
             msg = "No current data."
             client.send_message(destination, msg)
             return
@@ -320,7 +320,7 @@ def cmd_parser(input):
         msg = stats.get_batter(input[4])
         client.send_message(destination, msg)
     elif ":@pitcher" in input:
-        if input[4] == None or input[4] == "":
+        if len(input) < 5:
             msg = "No current data."
             client.send_message(destination, msg)
             return
