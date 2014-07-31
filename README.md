@@ -19,6 +19,8 @@ Working commands:
 * @settopic append *str* - will set the topic for the day's game *and* add the string that follows *append*
 * @status - prints the status of the current game (not always up-to-date because json isn't constantly updated on mlb.com)
 * @lineup - prints the current/upcoming game's lineup (only works the day of)
+* @batter *first name* or *last name* - prints some good batting stats for given SF player (includes pitchers' batting stats)
+* @pitcher *first name* or *last name* - prints relevant pitcher stats, can be expanded
 * @exit - bot closes up shop and disconnects from the default server (freenode in this case)
 
 Obviously there's a bit of overlap here. Hoping to consolidate these in the near future if possible. Suggestions are welcome!
