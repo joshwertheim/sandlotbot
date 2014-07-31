@@ -5,7 +5,7 @@ import sys
 import os
 import time
 from datetime import date
-from datetime import datetime
+import datetime
 import urllib2
 import json
 import socket
@@ -57,6 +57,17 @@ def get_todays_date():
     global day
 
     d = date.today()
+    today = d.timetuple()
+    year = today[0]
+    month = today[1]
+    day = today[2]
+
+def get_tomorrows_date():
+    global year
+    global month
+    global day
+
+    d = date.today() + datetime.timedelta(days=1)
     today = d.timetuple()
     year = today[0]
     month = today[1]
@@ -288,13 +299,21 @@ def cmd_parser(input):
         print_today()
         get_scoreboard_info()
 
+        tomorrow = ""
+
+        if giants_pitcher_name == "":
+            get_tomorrows_date()
+            print_today()
+            get_scoreboard_info()
+            tomorrow = " tomorrow"
+
         if len(input) > 5 and input[4] == "append":
             extra_str = input[5:]
             # msg = today_game + " PST. " + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA." % (giants_pitcher_era) + " %s" % (" ".join(extra_str))
-            send("TOPIC " + input[2] + " :" + today_game + " PST. " + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA." % (giants_pitcher_era) + " %s" % (" ".join(extra_str)) + "\r\n")
+            send("TOPIC " + input[2] + " :" + today_game + " PST. " + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA%s." % (giants_pitcher_era, tomorrow) + " %s" % (" ".join(extra_str)) + "\r\n")
             # client.send_message(destination, msg)
         else:
-            send("TOPIC " + input[2] + " :" + today_game + " PST. " + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA" % (giants_pitcher_era) + "\r\n")
+            send("TOPIC " + input[2] + " :" + today_game + " PST. " + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA%s" % (giants_pitcher_era, tomorrow) + "\r\n")
     elif ":@status" in input:
         get_scoreboard_info()
         if current_game_status != "":    
