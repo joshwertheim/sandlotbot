@@ -73,14 +73,14 @@ class PlayerStatsParser(object):
 
     def get_batter(self, name):
         for player in self.batter_list:
-            if name in player.last_name or name in player.first_name:
+            if name.lower() in player.last_name.lower() or name.lower() in player.first_name.lower():
                 msg = "%s %s - AVG: %s, SLG: %s, HR: %s, RBI: %s, SO: %s, OPS: %s, OBP: %s" % (player.first_name, player.last_name, player.avg, player.slg, player.hr, player.rbi, player.so, player.ops, player.obp)
                 return msg
         return "No stats found."
 
     def get_pitcher(self, name):
         for player in self.pitcher_list:
-            if name in player.last_name or name in player.first_name:
+            if name.lower() in player.last_name.lower() or name.lower() in player.first_name.lower():
                 msg = "%s %s - ERA: %s, WHIP: %s, IP: %s, BB: %s, SO: %s, HR: %s" % (player.first_name, player.last_name, player.era, player.whip, player.ip, player.bb, player.so, player.hr)
                 return msg
         return "No stats found."
