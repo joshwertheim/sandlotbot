@@ -310,10 +310,10 @@ def cmd_parser(input):
         if len(input) > 5 and input[4] == "append":
             extra_str = input[5:]
             # msg = today_game + " PST. " + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA." % (giants_pitcher_era) + " %s" % (" ".join(extra_str))
-            send("TOPIC " + input[2] + " :" + today_game + " PST. " + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA%s." % (giants_pitcher_era, tomorrow) + " %s" % (" ".join(extra_str)) + "\r\n")
+            send("TOPIC " + input[2] + " :" + today_game + " PST%s. " % (tomorrow) + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA." % (giants_pitcher_era) + " %s" % (" ".join(extra_str)) + "\r\n")
             # client.send_message(destination, msg)
         else:
-            send("TOPIC " + input[2] + " :" + today_game + " PST. " + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA%s" % (giants_pitcher_era, tomorrow) + "\r\n")
+            send("TOPIC " + input[2] + " :" + today_game + " PST%s. " % (tomorrow) + "Starting pitcher: " + giants_pitcher_name + " with a %s ERA" % (giants_pitcher_era) + "\r\n")
     elif ":@status" in input:
         get_scoreboard_info()
         if current_game_status != "":    
