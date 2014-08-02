@@ -336,16 +336,18 @@ def cmd_parser(input):
             client.send_message(destination, msg)
             return
         stats.parse_stats()
-        msg = stats.get_batter(input[4])
-        client.send_message(destination, msg)
+        results = stats.get_batter(input[4])
+        for msg in results:    
+            client.send_message(destination, msg)
     elif ":@pitcher" in input:
         if len(input) < 5:
             msg = "No current data."
             client.send_message(destination, msg)
             return
         stats.parse_stats()
-        msg = stats.get_pitcher(input[4])
-        client.send_message(destination, msg)
+        results = stats.get_pitcher(input[4])
+        for msg in results:    
+            client.send_message(destination, msg)
     elif ":@commands" in input:
         msg = "@status (during game), @headlines, @headlines N (choose which story), @headlines top5 (get the top 5 articles' titles with their item numbers), @headlines refresh (manually update @headlines cache), @settopic to set the new topic for the next game (for now only the day of will fetch new info), @settopic append *string* resets topic and appends a given string, @lineup today's game's lineup for SF Giants."
         client.send_message(destination, msg)
