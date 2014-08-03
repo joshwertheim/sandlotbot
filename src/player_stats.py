@@ -2,7 +2,7 @@ import urllib2
 import xml.etree.ElementTree as ET
 
 class Batter(object):
-    """docstring for Batter"""
+    """Creates a Batter object with relevant properties"""
     def __init__(self, first_name, last_name, avg, slg, hr, rbi, so, ops, obp):
         self.first_name = first_name
         self.last_name = last_name
@@ -15,7 +15,7 @@ class Batter(object):
         self.obp = obp
 
 class Pitcher(object):
-    """docstring for Pitcher"""
+    """Creates a Pitcher object with relevant properties"""
     def __init__(self, first_name, last_name, era, whip, ip, bb, so, hr):
         self.first_name = first_name
         self.last_name = last_name
@@ -27,11 +27,13 @@ class Pitcher(object):
         self.hr = hr
         
 class PlayerStatsParser(object):
-    """docstring for PlayerStatsParser"""
+    """Creates a PlayerStatsParser object capable of parsing XML at the given URL containing player stats"""
     
     batter_list = list()
     pitcher_list = list()
 
+    # downloads and parses the default URL into a tree using ElementTree
+    # sorts stats into either a batter list or pitcher list
     def parse_stats(self):
         url = "http://giants.mlb.com/gdcross/components/team/stats/year_2014/137-stats.xml"
         request = urllib2.Request(url, headers={"Accept" : "application/xml"})
@@ -71,6 +73,9 @@ class PlayerStatsParser(object):
             pitcher = Pitcher(node_first_name, node_last_name, node_era, node_whip, node_ip, node_bb, node_so, node_hr)
             self.pitcher_list.append(pitcher)
 
+    # gets the batter with the param 'name'
+    # capable of retrieving multiple batters with same name
+    # for instance '@batter brandon' will return both Crawford and Belt
     def get_batter(self, name):
         results = list()
         for player in self.batter_list:
@@ -85,6 +90,8 @@ class PlayerStatsParser(object):
             results.append("No stats found.")
             return results
 
+    # gets the pitcher with the param 'name'
+    # capable of retrieving multiple pitcher with same name if necessary
     def get_pitcher(self, name):
         results = list()
         for player in self.pitcher_list:
