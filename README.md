@@ -1,4 +1,4 @@
-sandlotbot
+sandlotbot (significant development halted until 2015 season begins)
 ==========
 
 IRC bot for retrieving information specific to the San Francisco Giants (for now). This bot is a work in progress. Needs lots of refactoring. More features to come.
