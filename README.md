@@ -1,13 +1,27 @@
-sandlotbot (significant development halted until 2015 season begins)
+sandlotbot 
 ==========
 
 IRC bot for retrieving information specific to the San Francisco Giants (for now). This bot is a work in progress. Needs lots of refactoring. More features to come.
 
-Feel free to submit a pull-request!
+Feel free to submit a pull-request! There's much to be done and added.
 
 Currently uses a set of three different JSON feeds provided by the Major League Baseball website. Keep in mind that these could change at any time and break the bot's parser.
 
-To run: simply clone this repository to a destination of your choosing. Set your command-line terminal to the repo, and then just run "python sandlotbot.py"
+To run:
+
+1. Clone this repository to a destination of your choosing
+2. Set your command-line terminal to the repo
+3. You'll need to create some config.txt type of file (info below) and set up the config parser's path so it knows where it's located
+4. Run "python sandlotbot.py"
+
+Example config.txt:
+```
+[CREDENTIALS]
+NICK = sandlotbot
+IDENT = sandlotbot
+REALNAME = sandlotbot
+PASS = xxxxxxxxxxxx
+```
 
 Working commands:
 
