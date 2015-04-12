@@ -2,15 +2,16 @@
 # currently meant to be run alongside sandlotbot
 
 import socket
+import ConfigParser
 
-debug = False
+debug = True
 
 class IRCClient(object):
     """Creates an IRCClient instance with basic server config and functions"""
 
     # sets default IRC server settings
     # to-do: *maybe* add support for multiple channels...
-    SERVER = "irc.freenode.net"
+    SERVER = "morgan.freenode.net"
     sock = ""
     if not debug:
         INIT_CHANNEL = "#sfgiants"
@@ -40,11 +41,15 @@ class Bot(object):
     irc_client = ""
 
     def __init__(self, client):
-        self.NICK = "sandlotbot"
-        self.IDENT = "sandlotbot"
-        self.REALNAME = "spike021's mlb bot"
-        self.PASS = "b6XH5QmVQLP7rS6"
+        config = ConfigParser.RawConfigParser()
+        config.read("../resources/prefs.txt")
+
+        self.NICK = config.get('CREDENTIALS', 'NICK')
+        self.IDENT = config.get('CREDENTIALS', 'IDENT')
+        self.REALNAME = config.get('CREDENTIALS', 'REALNAME')
+        self.PASS = config.get('CREDENTIALS', 'PASS')
         self.irc_client = client
+        print "nick: %s\nident: %s\nrealname: %s\npass: %s\n" % (self.NICK, self.IDENT, self.REALNAME, self.PASS)
 
     def identify(self):
         self.irc_client.sock.send("NICK %s\r\n" % self.NICK)

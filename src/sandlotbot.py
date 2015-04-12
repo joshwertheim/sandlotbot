@@ -225,6 +225,27 @@ def get_scoreboard_info():
                 giants_pitcher_era = game["pitcher"]["era"]
                 return
 
+# current_score_message = ""
+
+# def get_current_score():
+#     global client
+#     send = client.sock.send
+
+#     dest = IRCClient.INIT_CHANNEL
+
+#     client.send_message(dest, "hi")
+
+#     # get_scoreboard_info()
+#     # if current_game_status != "":
+#     #     msg = current_game_status
+#     # else:
+#     #     msg = end_game_message
+#     # if msg != current_score_message:
+#     #     client.send_message(dest, msg)
+#     # sleep(5)
+#     # threading.Timer(5, get_current_score).start()
+
+
 def cmd_parser(input):
     global client
     global return_addr
