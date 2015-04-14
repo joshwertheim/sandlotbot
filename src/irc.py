@@ -4,7 +4,7 @@
 import socket
 import ConfigParser
 
-debug = True
+debug = False
 
 class IRCClient(object):
     """Creates an IRCClient instance with basic server config and functions"""

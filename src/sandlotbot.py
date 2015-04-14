@@ -11,6 +11,8 @@ import json
 import socket
 import string
 
+import threading
+
 from feed import Feed
 from irc import IRCClient, Bot
 from player_stats import PlayerStatsParser
@@ -23,6 +25,32 @@ class NewsItem(object):
     def __init__(self, blurb, article):
         self.blurb = blurb
         self.article = article
+
+class ScoreWatcher(object):
+    """docstring for ScoreWatcher"""
+    def __init__(self):
+        self.running = True
+        self.last_msg = ''
+
+    def terminate(self):
+        self.running = False
+
+    def run(self):
+        while self.running:
+            self.get_current_score()
+            time.sleep(5)
+
+    def get_current_score(self):
+        global client
+        global current_game_status
+        send = client.sock.send
+        dest = IRCClient.INIT_CHANNEL
+
+        get_scoreboard_info()
+        if current_game_status != "" and self.last_msg != current_game_status and "Final" not in self.last_msg:    
+            msg = current_game_status
+            self.last_msg = msg
+            client.send_message(dest, msg)
 
 client = ""
 user = ""
@@ -225,32 +253,18 @@ def get_scoreboard_info():
                 giants_pitcher_era = game["pitcher"]["era"]
                 return
 
-# current_score_message = ""
+current_score_message = ""
 
-# def get_current_score():
-#     global client
-#     send = client.sock.send
-
-#     dest = IRCClient.INIT_CHANNEL
-
-#     client.send_message(dest, "hi")
-
-#     # get_scoreboard_info()
-#     # if current_game_status != "":
-#     #     msg = current_game_status
-#     # else:
-#     #     msg = end_game_message
-#     # if msg != current_score_message:
-#     #     client.send_message(dest, msg)
-#     # sleep(5)
-#     # threading.Timer(5, get_current_score).start()
-
+is_watching = False
+sw = ScoreWatcher()
+game_status_thread = threading.Thread(target=sw.run)
 
 def cmd_parser(input):
     global client
     global return_addr
     global players
     global stories
+    global is_watching
 
     # if ":spike021" not in input[0]:
     #     return
@@ -369,6 +383,13 @@ def cmd_parser(input):
         results = stats.get_pitcher(input[4])
         for msg in results:    
             client.send_message(destination, msg)
+    elif ":@watch" in input:
+        if is_watching is False:
+            game_status_thread.start()
+            is_watching = True
+        else:
+            sw.terminate()
+            is_watching = False
     elif ":@commands" in input:
         msg = "@status (during game), @headlines, @headlines N (choose which story), @headlines top5 (get the top 5 articles' titles with their item numbers), @headlines refresh (manually update @headlines cache), @settopic to set the new topic for the next game (for now only the day of will fetch new info), @settopic append *string* resets topic and appends a given string, @lineup today's game's lineup for SF Giants."
         client.send_message(destination, msg)
