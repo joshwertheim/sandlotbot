@@ -11,7 +11,7 @@ class IRCClient(object):
 
     # sets default IRC server settings
     # to-do: *maybe* add support for multiple channels...
-    SERVER = "morgan.freenode.net"
+    SERVER = "irc.freenode.net"
     sock = ""
     if not debug:
         INIT_CHANNEL = "#sfgiants"
