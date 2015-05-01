@@ -1,4 +1,6 @@
+from datetime import date
 import urllib2
+
 import xml.etree.ElementTree as ET
 
 class Batter(object):
@@ -35,7 +37,11 @@ class PlayerStatsParser(object):
     # downloads and parses the default URL into a tree using ElementTree
     # sorts stats into either a batter list or pitcher list
     def parse_stats(self):
-        url = "http://giants.mlb.com/gdcross/components/team/stats/year_2014/137-stats.xml"
+        d = date.today()
+        today = d.timetuple()
+        year = today[0]
+
+        url = "http://giants.mlb.com/gdcross/components/team/stats/year_%s/137-stats.xml" % (year)
         request = urllib2.Request(url, headers={"Accept" : "application/xml"})
 
         data = urllib2.urlopen(request)
